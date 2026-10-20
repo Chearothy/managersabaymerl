@@ -190,6 +190,7 @@
   // Expose Firestore tools globally for background syncing
   window.firebaseDb = db;
   window.firebaseFirestoreFns = { doc, setDoc };
+  
 </script>
 
 <script>
@@ -616,11 +617,12 @@
       
       // Update UI instantly
       await refreshCurrent(false);
-
-      // 2. Save to Firebase in the background using your CDN setup
-      if (window.firebaseDb && window.firebaseFirestoreFns) {
-        const { doc, setDoc } = window.firebaseFirestoreFns;
-        const docRef = doc(window.firebaseDb, "connected_folders", newFolderObj.key);
+        if (window.firebaseDb && window.firebaseFirestoreFns) {
+        const { collection, doc, setDoc } = window.firebaseFirestoreFns;
+        // ប្រើប្រាស់ collection("connected_folders") បន្ទាប់មកใส่ folderId ជា Document ID
+        const colRef = collection(window.firebaseDb, "connected_folders");
+        const docRef = doc(colRef, folderId);
+        
         setDoc(docRef, newFolderObj).catch(err => {
           console.error("Background sync to Firebase failed:", err);
         });
