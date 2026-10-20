@@ -613,7 +613,7 @@
   async function addFolder(){
     const linkInput = document.getElementById('new-link'), labelInput = document.getElementById('new-label');
     addButton.disabled = true;
-    setMessage(addStatus, 'Checking folder link…', '');
+    setMessage(addStatus, 'Saving folder…', '');
 
     try {
       const link = validateFolderLink(linkInput.value);
@@ -629,20 +629,23 @@
       const label = labelInput.value.trim().slice(0, 80) || 'Public Drive folder';
       const newFolderObj = { key: key, id: folderId, name: label, link: link };
       
+      // Save directly to cloud without scanning the folder contents yet
       await saveCloudFolder(newFolderObj);
 
-      setMessage(addStatus, 'Folder added successfully.', 'ok');
+      setMessage(addStatus, 'Folder added successfully!', 'ok');
       labelInput.value = '';
       linkInput.value = '';
-      path = [];
-      await refreshCurrent(false);
+      
+      // Just reload the list of connected folders in the settings panel instantly
+      folders = await readFolders();
+      renderSettings();
     } catch(error) {
       setMessage(addStatus, error.message || 'Could not add folder.', 'error');
     } finally {
       addButton.disabled = false;
     }
   }
-
+ 
   async function saveEdit(){
     const save = document.getElementById('save-edit');
     save.disabled = true;
